@@ -12,24 +12,28 @@ $.ajaxPrefilter(function(options) {
 
 });
 
+var timeToInterval = 5000;
+
 $(document).ready(function() {
 
     if ($('#viewer img') > 0) {
 
-      setInterval(function() {
+        setInterval(function() {
 
-        getAllData();
-        console.log('1');
-      }, 20000);
+            getAllData();
+
+        }, timeToInterval);
 
     } else {
-      console.log('2');
-      getAllData();
-      setInterval(function() {
 
         getAllData();
-        console.log('3');
-      }, 20000);
+
+        setInterval(function() {
+
+            getAllData();
+
+        }, timeToInterval);
+
     }
 
 });
@@ -42,11 +46,40 @@ function getAllData() {
 
         // var maxID = 0;
 
-        var maxPosition = 0;
+        var maxPosition = $('#viewer img').length > 0 ? $('#viewer img').attr('data-position') : 0;
 
         dataChotot = new Array();
 
         var buffData = new Object();
+
+        console.log(dataLoading);
+
+        if (maxPosition != 0) {
+
+            let src = '';
+
+            let alt = '';
+
+            for (let i = 0; i < dataLoading.length; i++) {
+
+                src = $(dataLoading[i]).attr('src');
+
+                alt = $(dataLoading[i]).attr('alt');
+
+                if ($('#viewer img').attr('src') == src && $('#viewer img').attr('alt') == alt) {
+
+                    dataLoading = dataLoading.splice(i+1, dataLoading.length);
+                    console.log('---dataLoading');
+                    console.log(dataLoading);
+                    break;
+                }
+
+                src = '';
+
+                alt = '';
+            }
+
+        }
 
         $("#viewer").prepend(dataLoading);
 
@@ -70,6 +103,7 @@ function getAllData() {
 
             buffData.position = maxPosition;
 
+            $(this).attr('data-position', maxPosition);
             // maxID++;
 
             maxPosition++;
@@ -97,7 +131,7 @@ function saveDataFirstLoad(dataChotot) {
         url: '/saveDataFirstLoad',
         success: function(data) {
             console.log('success');
-            console.log(JSON.stringify(data));
+            // console.log(JSON.stringify(data));
         },
         error: function(textstatus, errorThrown) {
             console.log('text status ' + textstatus + ', err ' + errorThrown);

@@ -28,7 +28,7 @@ module.exports = function(app, config) {
 
         Item.find({}).sort({
 
-            position: 1
+            position: -1
 
         }).exec(function(err, posts) {
 
