@@ -2,3 +2,5 @@ extends  ../includes/layout
 
 block main-content
     #viewer
+      for data in dataChotot
+        img(src = data.link, alt = data.description, data-position = data.position )

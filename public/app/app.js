@@ -1,101 +1,108 @@
 $.ajaxPrefilter(function(options) {
 
-  if (options.crossDomain && jQuery.support.cors) {
+    if (options.crossDomain && jQuery.support.cors) {
 
-    var http = (window.location.protocol === 'http:' ? 'http:' : 'https:');
+        var http = (window.location.protocol === 'http:' ? 'http:' : 'https:');
 
-    options.url = http + '//cors-anywhere.herokuapp.com/' + options.url;
+        options.url = http + '//cors-anywhere.herokuapp.com/' + options.url;
 
-    //options.url = "http://cors.corsproxy.io/url=" + options.url;
+        //options.url = "http://cors.corsproxy.io/url=" + options.url;
 
-  }
+    }
 
 });
 
-if ($('#viewer img') > 0) {
+$(document).ready(function() {
 
-  setInterval(function() {
+    if ($('#viewer img') > 0) {
 
-    getAllData();
+      setInterval(function() {
 
-  }, 20000);
+        getAllData();
+        console.log('1');
+      }, 20000);
 
-} else {
+    } else {
+      console.log('2');
+      getAllData();
+      setInterval(function() {
 
-  getAllData();
+        getAllData();
+        console.log('3');
+      }, 20000);
+    }
 
-}
+});
 
 function getAllData() {
 
-  $.get('http://www.chotot.vn/tp-ho-chi-minh/mua-ban/', function(response) {
+    $.get('http://www.chotot.vn/tp-ho-chi-minh/mua-ban/', function(response) {
 
-    var dataLoading = $(response).find('.listing_thumbs .listing_thumbs_image img');
+        var dataLoading = $(response).find('.listing_thumbs .listing_thumbs_image img');
 
-    var maxID = 0;
+        // var maxID = 0;
 
-    dataChotot = new Array();
+        var maxPosition = 0;
 
-    var buffData = new Object();
+        dataChotot = new Array();
 
-    $("#viewer").html(dataLoading);
+        var buffData = new Object();
 
-    var srcImage = '';
+        $("#viewer").prepend(dataLoading);
 
-    $("#viewer img").each(function(index) {
+        var srcImage = '';
 
-      srcImage = $(this).attr($(this).attr('data-original') === 'undefined' ? 'src' : 'data-original');
+        $("#viewer img").each(function(index) {
 
-      $(this).attr('src', srcImage);
+            srcImage = $(this).attr($(this).attr('data-original') === 'undefined' ? 'src' : 'data-original');
+
+            $(this).attr('src', srcImage);
+
+        });
+
+        $("#viewer img").each(function(index) {
+
+            // buffData.id = maxID;
+
+            buffData.link = $(this).attr('src');
+
+            buffData.description = $(this).attr('alt');
+
+            buffData.position = maxPosition;
+
+            // maxID++;
+
+            maxPosition++;
+
+            dataChotot.push(buffData);
+
+            buffData = {};
+
+        });
+
+        saveDataFirstLoad(dataChotot);
 
     });
-
-    $("#viewer img").each(function(index) {
-
-      buffData.id = maxID;
-
-      buffData.link = $(this).attr('src');
-
-      buffData.description = $(this).attr('alt');
-
-      buffData.position = 0;
-
-      maxID++;
-
-      dataChotot.push(buffData);
-
-      buffData = {};
-
-    });
-
-    console.log(dataChotot);
-    saveDataFirstLoad(dataChotot);
-
-    //convert data to json
-
-    //send data to server
-
-  });
 
 }
 
 function saveDataFirstLoad(dataChotot) {
 
-  var data = dataChotot;
+    var data = dataChotot;
 
-  $.ajax({
-    type: 'POST',
-    data: JSON.stringify(data),
-    contentType: 'application/json',
-    url: '/saveDataFirstLoad',
-    success: function(data) {
-      console.log('success');
-      console.log(JSON.stringify(data));
-    },
-    error: function(textstatus, errorThrown) {
-      console.log('text status ' + textstatus + ', err ' + errorThrown);
-    }
+    $.ajax({
+        type: 'POST',
+        data: JSON.stringify(data),
+        contentType: 'application/json',
+        url: '/saveDataFirstLoad',
+        success: function(data) {
+            console.log('success');
+            console.log(JSON.stringify(data));
+        },
+        error: function(textstatus, errorThrown) {
+            console.log('text status ' + textstatus + ', err ' + errorThrown);
+        }
 
-  });
+    });
 
 }
