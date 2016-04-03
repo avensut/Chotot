@@ -3,4 +3,5 @@ extends  ../includes/layout
 block main-content
     #viewer.viewer.m-top-170
       for data in dataChotot
+        //- .wrap_img(draggable="true", ondragover="dragItem(event)")
         img(src = data.link, title= data.description, alt = data.description, data-position = data.position)
