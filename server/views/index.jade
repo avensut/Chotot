@@ -1,6 +1,6 @@
 extends  ../includes/layout
 
 block main-content
-    #viewer
+    #viewer.viewer.m-top-170
       for data in dataChotot
-        img(src = data.link, alt = data.description, data-position = data.position )
+        img(src = data.link, title= data.description, alt = data.description, data-position = data.position)

@@ -12,7 +12,7 @@ $.ajaxPrefilter(function(options) {
 
 });
 
-var timeToInterval = 5000;
+var timeToInterval = 20000;
 
 $(document).ready(function() {
 
@@ -46,7 +46,9 @@ function getAllData() {
 
         // var maxID = 0;
 
-        var maxPosition = $('#viewer img').length > 0 ? $('#viewer img').attr('data-position') : 0;
+        var maxPosition = $('#viewer img').length > 0 ? (+$('#viewer img').attr('data-position') + 1) : 0;
+
+        // var maxPosition = $('#viewer img').length > 0 ? $('#viewer img').attr('data-position') : 20;
 
         dataChotot = new Array();
 
@@ -60,32 +62,36 @@ function getAllData() {
 
             let alt = '';
 
+            dataLoading.splice(4, dataLoading.length);
+
+            console.log(dataLoading.length);
+
             for (let i = 0; i < dataLoading.length; i++) {
 
-                src = $(dataLoading[i]).attr('src');
+                if (!checkDuplicateItem(dataLoading[i], $("#viewer img"))) {
 
-                alt = $(dataLoading[i]).attr('alt');
+                    dataLoading.splice(i, 1);
 
-                if ($('#viewer img').attr('src') == src && $('#viewer img').attr('alt') == alt) {
-
-                    dataLoading = dataLoading.splice(i+1, dataLoading.length);
-                    console.log('---dataLoading');
-                    console.log(dataLoading);
-                    break;
+                    i--;
                 }
 
-                src = '';
-
-                alt = '';
             }
+
+        }
+
+        for (let i = 0; i < dataLoading.length; i++) {
+
+            $(dataLoading[i]).addClass('img_new img_new_animation');
 
         }
 
         $("#viewer").prepend(dataLoading);
 
+        wrapImgDiv();
+
         var srcImage = '';
 
-        $("#viewer img").each(function(index) {
+        $("#viewer img.img_new").each(function(index) {
 
             srcImage = $(this).attr($(this).attr('data-original') === 'undefined' ? 'src' : 'data-original');
 
@@ -93,7 +99,7 @@ function getAllData() {
 
         });
 
-        $("#viewer img").each(function(index) {
+        $($("#viewer img.img_new").get().reverse()).each(function(index) {
 
             // buffData.id = maxID;
 
@@ -114,10 +120,38 @@ function getAllData() {
 
         });
 
+        $("#viewer img.img_new").removeClass('img_new');
+
         saveDataFirstLoad(dataChotot);
 
     });
 
+}
+
+function checkDuplicateItem(item, listItem) {
+
+    let src = '';
+
+    let alt = '';
+
+    for (let i = 0; i < listItem.length; i++) {
+
+        src = $(listItem[i]).attr('src');
+
+        alt = $(listItem[i]).attr('alt');
+
+        if ($(item).attr('src') == src && $(item).attr('alt') == alt) {
+
+            return false;
+
+        }
+
+        src = '';
+
+        alt = '';
+    }
+
+    return true;
 }
 
 function saveDataFirstLoad(dataChotot) {
@@ -130,11 +164,28 @@ function saveDataFirstLoad(dataChotot) {
         contentType: 'application/json',
         url: '/saveDataFirstLoad',
         success: function(data) {
+
             console.log('success');
             // console.log(JSON.stringify(data));
         },
         error: function(textstatus, errorThrown) {
             console.log('text status ' + textstatus + ', err ' + errorThrown);
+        }
+
+    });
+
+}
+
+function wrapImgDiv() {
+
+    $("#viewer img").each(function(index) {
+
+        console.log($(this).parent());
+
+        if (!$(this).parent().hasClass('wrap_img')) {
+
+            $(this).wrap("<div class=\"wrap_img\"></div>");
+
         }
 
     });
